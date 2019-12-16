@@ -48,7 +48,7 @@ class Flowshop():
             self.l_job += [j]
         # fermeture du fichier
         fdonnees.close()
-        print()
+        print("choulalahms")
 
 if __name__ == "__main__":
     prob = Flowshop()
