@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""Résolution du flowshop de permutation : 
+"""Résolution du flowshop de permutation :
  """
 
 __author__ = 'Chams Lahlou'
@@ -33,14 +33,14 @@ class Flowshop():
         # ouverture du fichier en mode lecture
         fdonnees = open(nom,"r")
         # lecture de la première ligne
-        ligne = fdonnees.readline() 
+        ligne = fdonnees.readline()
         l = ligne.split() # on récupère les valeurs dans une liste
         self.nb_jobs = int(l[0])
         self.nb_machines = int(l[1])
-       
+
         self.l_job = []
         for i in range(self.nb_jobs):
-            ligne = fdonnees.readline() 
+            ligne = fdonnees.readline()
             l = ligne.split()
             # on transforme les chaînes de caractères en entiers
             l = [int(i) for i in l]
@@ -48,6 +48,7 @@ class Flowshop():
             self.l_job += [j]
         # fermeture du fichier
         fdonnees.close()
+        print()
 
 if __name__ == "__main__":
     prob = Flowshop()
