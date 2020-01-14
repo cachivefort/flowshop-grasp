@@ -82,3 +82,4 @@ if __name__ == "__main__":
     ordo.afficher()
     a.afficher()
     b.afficher()
+    print("OK")
