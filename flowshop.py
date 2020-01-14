@@ -10,6 +10,10 @@
 __author__ = 'Chams Lahlou'
 __date__ = 'Octobre 2019'
 
+import job
+import ordonnancement
+import sommet
+
 from statistics import mean
 import heapq
 from copy import deepcopy
@@ -45,7 +49,7 @@ class Flowshop():
             l = ligne.split()
             # on transforme les chaînes de caractères en entiers
             l = [int(i) for i in l]
-            j = Job(i, l)
+            j = job.Job(i, l)
             self.l_job += [j]
         # fermeture du fichier
         fdonnees.close()
@@ -63,7 +67,7 @@ class Flowshop():
             #On teste les différentes durées des ordonnancements ou l'on place le job à la place 0, 1, ..., j.
             for i in range (len(l2)):
                 l2.insert(i,job)
-                ordo=Ordonnancement(self.nb_machines)
+                ordo=ordonnancement.Ordonnancement(self.nb_machines)
                 ordo.ordonnancer_liste_job(l2)
                 if a[0]<ordo.dur:
                     a[0]=ordo.dur
@@ -121,7 +125,7 @@ class Flowshop():
     def evaluation_separation(self):
 
         #Initialisation des différentes listes et variables que l'on va utiliser :
-        sommet=Sommet([],self.l_job,1000, 1)
+        sommet=sommet.Sommet([],self.l_job,1000, 1)
         file=[] #file ou on stocke les sommets. On push ensuite le premier sommet :
         heapq.heappush(file, sommet)
         opt=1000
@@ -362,7 +366,7 @@ if __name__ == "__main__":
     flow=Flowshop(0,0,[])
     flow.definir_par("tai51.txt")
 
-    flow.test(0.5)
-    print(flow.grasp(10))
+
+    print(flow.grasp(30))
 
 
