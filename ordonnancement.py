@@ -8,6 +8,7 @@ __date__ = 'Octobre 2019'
 
 import job
 
+
 class Ordonnancement():
 
     # constructeur pour un ordonnancement vide
@@ -78,7 +79,10 @@ if __name__ == "__main__":
     ordo = Ordonnancement(5)
     ordo.ordonnancer_job(a)
     ordo.ordonnancer_job(b)
-    ordo.sequence()
+    print("b")
+    print(ordo.sequence())
+
+    print("d")
     ordo.afficher()
     a.afficher()
     b.afficher()
