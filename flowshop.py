@@ -217,6 +217,49 @@ class Flowshop():
         print(mean(resultat1))
         print(mean(resultat2))
 
+    def greedyrandomised_rank(self):
+        alpha=random()
+
+        liste_jobs_restant = self.l_job.copy()
+        sequence=[]
+
+        while len(liste_jobs_restant)>1:
+
+            duree_ordo=[]
+            RCL=[]
+
+            for job in liste_jobs_restant:
+                #On mesure les durées de l'ordonnancement où on rajoute le job i, et on l'ajoute à une liste
+                ordo=ordonnancement.Ordonnancement(self.nb_machines)
+                ordo.ordonnancer_liste_job(sequence)
+                ordo.ordonnancer_job(job)
+                duree_ordo.append(ordo.duree())
+            #On défini l'intervalle de séléction des jobs
+            range_time=(max(duree_ordo)-min(duree_ordo))*alpha
+            #on selectionne les jobs qui sont dans cet intervale et on les ajoute à la liste RCL
+            for i in range(len(duree_ordo)):
+                if duree_ordo[i] <= min(duree_ordo)+range_time:
+                    RCL.append(liste_jobs_restant[i])
+            RCL_probabilise=self.RCL_probabilise(self.rank(RCL))
+            #On choisit un job au hasard parmis la liste RCL et on l'ajoute à la séquence
+            candidat=RCL_probabilise[randint(0,len(RCL_probabilise)-1)]
+
+            numero=0
+            for i in range(len(liste_jobs_restant)):
+                if liste_jobs_restant[i].calcul_distance_euclidienne()==candidat.calcul_distance_euclidienne():
+                    numero=i
+
+            sequence.append(liste_jobs_restant[numero])
+            del(liste_jobs_restant[numero])
+
+        sequence.append(liste_jobs_restant[0])
+        #on a un ordonnancement complet, on peut maintenant le renvoyer
+        ordo=ordonnancement.Ordonnancement(self.nb_machines)
+        ordo.ordonnancer_liste_job(sequence)
+        return [(ordo.duree()),ordo]
+
+
+
 
     def greedyrandomised2(self,alpha):
 
@@ -301,13 +344,11 @@ class Flowshop():
         alpha=0.5
         liste_ordonnacement=[]
         for i in range(nb_candidat):
-            ordo_first=self.greedyrandomised(alpha)[1]
+            ordo_first=self.greedyrandomised_rank()[1]
 
             ordo=self.recherchel_echange_job_total(ordo_first)
             liste_ordonnacement.append(ordo)
-            print("p")
-            print(ordo.duree())
-            print("s")
+
         min=1000000000
         ordonnacement_final=ordonnancement.Ordonnancement(self.nb_machines)
         for j in range(len(liste_ordonnacement)):
@@ -318,7 +359,7 @@ class Flowshop():
 
 
 
-    def rank(self, candidate_list, result):
+    def rank_recursive(self, candidate_list, result):
         # Condition d'arret
         if len(candidate_list) > 0:
             # Initialisation
@@ -355,26 +396,29 @@ class Flowshop():
             if minimum>distance_euclidienne_c:
                 minimum=distance_euclidienne_c
                 index_min=j
+
         resultat.append(candidate_list[index_min])
+
 
 
         for i in range (len(candidate_list)):
             max=10000000000
 
-                for j in range(len(candidate_list)):
-                    if list_eucli[j]<max and list_eucli[j]>minimum:
-                        minimum=candidate_list[j]
-                        index_min=j
-                resultat.append(candidate_list[index_min])
-            return resultat
 
-    def RCL_probabilise(self, RCL_parent):
-        result = []
-        RCL_temp = self.rank(RCL_parent, result)
-        for rang in range(len(RCL_temp), 1, -1):
-            for i in range(len(RCL_temp)-rang, 1, -1):
-                result.append(RCL_temp(rang))
-        return result
+            for j in range(len(candidate_list)):
+
+                if list_eucli[j]<max and list_eucli[j] > minimum:
+                    minimum=list_eucli[j]
+                    index_min=j
+            resultat.append(candidate_list[index_min])
+        return resultat
+
+    def RCL_probabilise(self, rank_list):
+        RCL_prob = []
+        for rang in range(len(rank_list), 1, -1):
+            for i in range(rang):
+                RCL_prob.append(rank_list[len(rank_list) - rang])
+        return RCL_prob
 
 
 
@@ -393,6 +437,6 @@ if __name__ == "__main__":
     flow.definir_par("tai51.txt")
 
 
-    print(flow.grasp(30))
+    print(flow.grasp(10))
 
 

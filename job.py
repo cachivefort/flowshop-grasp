@@ -28,6 +28,8 @@ class Job():
     def duree(self):
         return self.duree_job
 
+
+
     def calcul_distance_euclidienne(self):
         distance_euclidienne = 0
         for i in range(self.nb_op - 1):
