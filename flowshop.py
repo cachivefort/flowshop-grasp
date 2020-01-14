@@ -10,6 +10,9 @@
 __author__ = 'Chams Lahlou'
 __date__ = 'Octobre 2019'
 
+import ordonnancement
+import job
+
 from statistics import mean
 import heapq
 from copy import deepcopy
@@ -45,7 +48,7 @@ class Flowshop():
             l = ligne.split()
             # on transforme les chaînes de caractères en entiers
             l = [int(i) for i in l]
-            j = Job(i, l)
+            j = job.Job(i, l)
             self.l_job += [j]
         # fermeture du fichier
         fdonnees.close()
@@ -180,7 +183,7 @@ class Flowshop():
 
             for job in liste_jobs_restant:
                 #On mesure les durées de l'ordonnancement où on rajoute le job i, et on l'ajoute à une liste
-                ordo=Ordonnancement(self.nb_machines)
+                ordo=ordonnancement.Ordonnancement(self.nb_machines)
                 ordo.ordonnancer_liste_job(sequence)
                 ordo.ordonnancer_job(job)
                 duree_ordo.append(ordo.duree())
@@ -197,16 +200,16 @@ class Flowshop():
 
         sequence.append(liste_jobs_restant[0])
         #on a un ordonnancement complet, on peut maintenant le renvoyer
-        ordo=Ordonnancement(self.nb_machines)
+        ordo=ordonnancement.Ordonnancement(self.nb_machines)
         ordo.ordonnancer_liste_job(sequence)
-        return(ordo.duree())
+        return [(ordo.duree()),ordo]
 
     def test(self,alpha):
         resultat1=[]
         resultat2=[]
         for i in range(10):
-            resultat1.append(self.greedyrandomised(alpha))
-            resultat2.append(self.greedyrandomised2(alpha))
+            resultat1.append(self.greedyrandomised(alpha)[0])
+            resultat2.append(self.greedyrandomised2(alpha)[0])
             print(i)
         print(min(resultat1))
         print(min(resultat2))
@@ -226,7 +229,7 @@ class Flowshop():
             duree=0
             for job in liste_jobs_restant:
                 #On mesure les durées de l'ordonnancement où on rajoute le job i, et on l'ajoute à une liste
-                ordo=Ordonnancement(self.nb_machines)
+                ordo=ordonnancement.Ordonnancement(self.nb_machines)
                 ordo.ordonnancer_liste_job(sequence)
                 duree_debut=ordo.duree()
                 ordo.ordonnancer_job(job)
@@ -245,23 +248,87 @@ class Flowshop():
 
         sequence.append(liste_jobs_restant[0])
         #on a un ordonnancement complet, on peut maintenant le renvoyer
-        ordo=Ordonnancement(self.nb_machines)
+        ordo=ordonnancement.Ordonnancement(self.nb_machines)
         ordo.ordonnancer_liste_job(sequence)
-        return(ordo.duree())
+        return[(ordo.duree()),ordo]
+
+    # on cherche des meilleurs ordonnacement que celui initilal, on changeant à chaque fois l'ordre de deux job
+    def recherchel_echange_job_radom(self,iteration,ordonnancement):
+        duree_test=ordonnancement.duree_ordo()
+        sequence_test=ordonnancement.seq()
+        for i in range (iteration):
+            ordo = ordonnancement.Ordonnancement(self.nb_machines)
+            new_sequence=sequence_test
+            index1=random.randint(0,self.nb_jobs-1)
+            index2=random.randint(0,self.nb_jobs-1)
+            new_sequence[index1]=sequence_test[index2]
+            new_sequence[index2]=sequence_test[index1]
+            ordo.ordonnancer_liste_job(new_sequence)
+            if ordo.duree()<duree_test:
+                duree_test=ordo.duree()
+                sequence_test=new_sequence
+        ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
+        ordonnancement_final.ordonnacer_liste_jpb(sequence_test)
+        return ordonnancement_final
+
+    def recherchel_echange_job_total(self,ordonnancement_debut):
+        duree_test=ordonnancement_debut.duree()
+        print("dure")
+        print(duree_test)
+        sequence_test=ordonnancement_debut.sequence()
+        sequence_final=[]
+        for i in range (self.nb_jobs):
+            for j in range (self.nombre_jobs()):
+                if j!=i:
+
+                    ordo = ordonnancement.Ordonnancement(self.nb_machines)
+                    new_sequence=sequence_test
+
+                    new_sequence[i]=sequence_test[j]
+                    new_sequence[j]=sequence_test[i]
+                    ordo.ordonnancer_liste_job(new_sequence)
+                    if ordo.duree()<duree_test:
+                        duree_test=ordo.duree()
+                        sequence_final=ordo.sequence()
+
+        ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
+
+        ordonnancement_final.ordonnancer_liste_job(sequence_final)
+        return ordonnancement_final
+
+    def grasp(self,nb_candidat):
+        alpha=0.5
+        liste_ordonnacement=[]
+        for i in range(nb_candidat):
+            ordo_first=self.greedyrandomised(alpha)[1]
+
+            ordo=self.recherchel_echange_job_total(ordo_first)
+            liste_ordonnacement.append(ordo)
+            print("p")
+            print(ordo.duree())
+            print("s")
+        min=1000000000
+        ordonnacement_final=ordonnancement.Ordonnancement(self.nb_machines)
+        for j in range(len(liste_ordonnacement)):
+            if liste_ordonnacement[j].duree()<min:
+                min=liste_ordonnacement[j].duree()
+                ordonnacement_final=liste_ordonnacement[j]
+        return ordonnacement_final,ordonnacement_final.duree()
+
+
+
+
+
+
+
+
 
 
 
 if __name__ == "__main__":
-    job1=Job(1,[2,2,7,8,2,4,6])
-    job2=Job(2,[2,3,8,9,3,5,7])
-    job3=Job(3,[3,3,7,7,1,2,9])
-    job4=Job(4,[3,4,9,9,4,1,7])
-    job5=Job(5,[4,2,7,9,2,8,3])
-    job6=Job(6,[3,3,1,8,1,8,6])
-    job7=Job(7,[4,3,6,6,5,6,8])
-    job8=Job(8,[1,3,4,7,4,1,9])
-    job9=Job(9,[2,3,8,7,6,9,1])
-    job10=Job(10,[3,3,7,4,2,2,5])
+
+
+
 
 
 
@@ -270,7 +337,7 @@ if __name__ == "__main__":
     #flow.evaluation_separation()
     flow=Flowshop(0,0,[])
     flow.definir_par("tai51.txt")
-
-    flow.test(0.5)
+    print(flow.test(0.5))
+    print(flow.grasp(10))
 
 
