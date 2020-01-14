@@ -31,7 +31,7 @@ class Job():
     def calcul_distance_euclidienne(self):
         distance_euclidienne = 0
         for i in range(self.nb_op - 1):
-            distance_euclidienne += abs(self.duree_op[i] - self.duree_op[i + 1])
+            distance_euclidienne += abs(self.duree_op[i] - self.duree_op[i + 1])**2
             distance_euclidienne = distance_euclidienne ** (1 / 2)
         return distance_euclidienne
 

@@ -324,8 +324,8 @@ class Flowshop():
             # Initialisation
             index_min = 0
             minimum = 0
-            for j in range(len(candidate_list[0])):
-                minimum = candidate_list[0].calcul_distance_euclidienne()
+
+            minimum = candidate_list[0].calcul_distance_euclidienne()
 
             # Hérédité
             for i in range(len(candidate_list)):
@@ -341,6 +341,32 @@ class Flowshop():
             self.rank(candidate_list, result)
         # Conclusion
         return result
+
+    def rank(self, candidate_list):
+        list_eucli=[]
+        resultat=[]
+
+        index_min = 0
+        minimum = 10000000000000
+
+        for j in range(len(candidate_list)):
+            distance_euclidienne_c=candidate_list[j].calcul_distance_euclidienne()
+            list_eucli.append(distance_euclidienne_c)
+            if minimum>distance_euclidienne_c:
+                minimum=distance_euclidienne_c
+                index_min=j
+        resultat.append(candidate_list[index_min])
+
+
+        for i in range (len(candidate_list)):
+            max=10000000000
+
+                for j in range(len(candidate_list)):
+                    if list_eucli[j]<max and list_eucli[j]>minimum:
+                        minimum=candidate_list[j]
+                        index_min=j
+                resultat.append(candidate_list[index_min])
+            return resultat
 
     def RCL_probabilise(self, RCL_parent):
         result = []
