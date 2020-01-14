@@ -228,13 +228,13 @@ class Flowshop():
         # Conclusion
         return result
 
-    def RCL_probabilise(self, RCL_parent):
-        result = []
-        RCL_temp = self.rank(RCL_parent, result)
-        for rang in range(len(RCL_temp), 1, -1):
-            for i in range(len(RCL_temp)-rang, 1, -1):
-                result.append(RCL_temp(rang))
-        return result
+
+    def RCL_probabilise(self, rank_list):
+        RCL_prob = []
+        for rang in range(len(rank_list), 1, -1):
+            for i in range(rang):
+                RCL_prob.append(rank_list[len(rank_list) - rang])
+        return RCL_prob
 
 
 
