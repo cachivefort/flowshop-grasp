@@ -240,8 +240,9 @@ class Flowshop():
             for i in range(len(duree_ordo)):
                 if duree_ordo[i] <= min(duree_ordo)+range_time:
                     RCL.append(liste_jobs_restant[i])
+            # on crée une liste RCL probabilisé où chaque candidat à une probabilité d'être choisi
             RCL_probabilise=self.RCL_probabilise(self.rank(RCL))
-            #On choisit un job au hasard parmis la liste RCL et on l'ajoute à la séquence
+            #On choisit un job au hasard parmis la liste RCL_probabilise et on l'ajoute à la séquence
             candidat=RCL_probabilise[randint(0,len(RCL_probabilise)-1)]
 
             numero=0
@@ -300,9 +301,13 @@ class Flowshop():
 
     # on cherche des meilleurs ordonnacement que celui initilal, on changeant à chaque fois l'ordre de deux job
     def recherchel_echange_job_random(self,iteration,ordo1):
+
+        # initialisation
         duree_test=ordo1.duree()
         sequence_test=ordo1.sequence().copy()
         sequence_final=[]
+
+        #on éffectue un nombre d'échange àléatoire entre deux élément
         for i in range (iteration):
             ordo = ordonnancement.Ordonnancement(self.nb_machines)
             new_sequence=sequence_test.copy()
@@ -311,53 +316,57 @@ class Flowshop():
             new_sequence[index1]=sequence_test[index2]
             new_sequence[index2]=sequence_test[index1]
             ordo.ordonnancer_liste_job(new_sequence)
+            #si la nouvelle séquence donne un meilleur résultat, on change la sequence final
             if ordo.duree()<duree_test:
                 duree_test=ordo.duree()
                 sequence_final=new_sequence.copy()
+
+        #on cree notre ordonnacement final avec la sequence final
         ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
         ordonnancement_final.ordonnancer_liste_job(sequence_final)
         return ordonnancement_final
 
     def recherchel_echange_job_total(self,ordonnancement_debut):
+        # initialisation
+
         duree_test=ordonnancement_debut.duree()
-
-
         sequence_test=ordonnancement_debut.sequence().copy()
         sequence_final=[]
+        #on effectue tout les échanges possible deux à deux avec la séquence initial
         for i in range (self.nb_jobs):
             for j in range (self.nombre_jobs()):
                 if j!=i:
-
                     ordo = ordonnancement.Ordonnancement(self.nb_machines)
                     new_sequence=sequence_test.copy()
-
-
                     new_sequence[i]=sequence_test[j]
                     new_sequence[j]=sequence_test[i]
-
                     ordo.ordonnancer_liste_job(new_sequence)
 
-
+                    # si la nouvelle séquence donne un meilleur résultat, on change la sequence final
                     if ordo.duree()<duree_test:
                         duree_test=ordo.duree()
                         sequence_final=ordo.sequence().copy()
 
+        # on cree notre ordonnacement final avec la sequence final
         ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
-
         ordonnancement_final.ordonnancer_liste_job(sequence_final)
         return ordonnancement_final
 
     def grasp(self,nb_candidat):
+        #initialisation
         alpha=0.5
         liste_ordonnacement=[]
+
+        #on crée une liste de candidat avec un ordonnacement donnée par le RCL
+        #Puis sur chaque, on effecute la recherche local choisi
         for i in range(nb_candidat):
             ordo_first=self.greedyrandomised_rank()[1]
-
-
+            #recherche local choisi
             ordo=self.recherchel_echange_job_total(ordo_first)
+            #
             liste_ordonnacement.append(ordo)
 
-
+        #on cherche le meilleur des candidats obtenu
         min=1000000000
         ordonnacement_final=ordonnancement.Ordonnancement(self.nb_machines)
         for j in range(len(liste_ordonnacement)):
@@ -393,36 +402,33 @@ class Flowshop():
         # Conclusion
         return result
 
+    #fonction permettant de trier une liste de job par ordre de distance euclidienne croissant
     def rank(self, candidate_list):
+        #initialisation
         list_eucli=[]
         resultat=[]
-
         index_min = 0
         minimum = 10000000000000
-
+        #on cherche le candidat ayant la plus faible distance euclidienne
         for j in range(len(candidate_list)):
             distance_euclidienne_c=candidate_list[j].calcul_distance_euclidienne()
             list_eucli.append(distance_euclidienne_c)
             if minimum>distance_euclidienne_c:
                 minimum=distance_euclidienne_c
                 index_min=j
-
         resultat.append(candidate_list[index_min])
 
-
-
+        #puis on rempli la liste dans l'ordre croissant
         for i in range (len(candidate_list)):
             max=10000000000
-
-
             for j in range(len(candidate_list)):
-
                 if list_eucli[j]<max and list_eucli[j] > minimum:
                     minimum=list_eucli[j]
                     index_min=j
             resultat.append(candidate_list[index_min])
         return resultat
-
+    #crée une liste RCL_probabilisé
+    #ceux qui ont un meilleur rang dans la liste initial seront présent un nombre de fois plus important dans la liste final
     def RCL_probabilise(self, rank_list):
         RCL_prob = []
         for rang in range(len(rank_list), 1, -1):
