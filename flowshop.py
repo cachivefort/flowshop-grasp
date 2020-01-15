@@ -252,7 +252,9 @@ class Flowshop():
             sequence.append(liste_jobs_restant[numero])
             del(liste_jobs_restant[numero])
 
+
         sequence.append(liste_jobs_restant[0])
+
         #on a un ordonnancement complet, on peut maintenant le renvoyer
         ordo=ordonnancement.Ordonnancement(self.nb_machines)
         ordo.ordonnancer_liste_job(sequence)
@@ -297,43 +299,48 @@ class Flowshop():
         return[(ordo.duree()),ordo]
 
     # on cherche des meilleurs ordonnacement que celui initilal, on changeant à chaque fois l'ordre de deux job
-    def recherchel_echange_job_radom(self,iteration,ordonnancement):
-        duree_test=ordonnancement.duree_ordo()
-        sequence_test=ordonnancement.seq()
+    def recherchel_echange_job_random(self,iteration,ordo1):
+        duree_test=ordo1.duree()
+        sequence_test=ordo1.sequence().copy()
+        sequence_final=[]
         for i in range (iteration):
             ordo = ordonnancement.Ordonnancement(self.nb_machines)
-            new_sequence=sequence_test
-            index1=random.randint(0,self.nb_jobs-1)
-            index2=random.randint(0,self.nb_jobs-1)
+            new_sequence=sequence_test.copy()
+            index1=randint(0,self.nb_jobs-1)
+            index2=randint(0,self.nb_jobs-1)
             new_sequence[index1]=sequence_test[index2]
             new_sequence[index2]=sequence_test[index1]
             ordo.ordonnancer_liste_job(new_sequence)
             if ordo.duree()<duree_test:
                 duree_test=ordo.duree()
-                sequence_test=new_sequence
+                sequence_final=new_sequence.copy()
         ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
-        ordonnancement_final.ordonnacer_liste_jpb(sequence_test)
+        ordonnancement_final.ordonnancer_liste_job(sequence_final)
         return ordonnancement_final
 
     def recherchel_echange_job_total(self,ordonnancement_debut):
         duree_test=ordonnancement_debut.duree()
-        print("dure")
-        print(duree_test)
-        sequence_test=ordonnancement_debut.sequence()
+
+
+        sequence_test=ordonnancement_debut.sequence().copy()
         sequence_final=[]
         for i in range (self.nb_jobs):
             for j in range (self.nombre_jobs()):
                 if j!=i:
 
                     ordo = ordonnancement.Ordonnancement(self.nb_machines)
-                    new_sequence=sequence_test
+                    new_sequence=sequence_test.copy()
+
 
                     new_sequence[i]=sequence_test[j]
                     new_sequence[j]=sequence_test[i]
+
                     ordo.ordonnancer_liste_job(new_sequence)
+
+
                     if ordo.duree()<duree_test:
                         duree_test=ordo.duree()
-                        sequence_final=ordo.sequence()
+                        sequence_final=ordo.sequence().copy()
 
         ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
 
@@ -346,12 +353,15 @@ class Flowshop():
         for i in range(nb_candidat):
             ordo_first=self.greedyrandomised_rank()[1]
 
+
             ordo=self.recherchel_echange_job_total(ordo_first)
             liste_ordonnacement.append(ordo)
+
 
         min=1000000000
         ordonnacement_final=ordonnancement.Ordonnancement(self.nb_machines)
         for j in range(len(liste_ordonnacement)):
+
             if liste_ordonnacement[j].duree()<min:
                 min=liste_ordonnacement[j].duree()
                 ordonnacement_final=liste_ordonnacement[j]
@@ -434,9 +444,53 @@ if __name__ == "__main__":
     #flow.creer_liste_NEH()
     #flow.evaluation_separation()
     flow=Flowshop(0,0,[])
-    flow.definir_par("tai51.txt")
+    flow1 = Flowshop(0, 0, [])
+    flow2 = Flowshop(0, 0, [])
+    flow3 = Flowshop(0, 0, [])
+    flow4 = Flowshop(0, 0, [])
+    flow5 = Flowshop(0, 0, [])
+    flow6 = Flowshop(0, 0, [])
+    flow7 = Flowshop(0, 0, [])
+    flow8 = Flowshop(0, 0, [])
+    flow9= Flowshop(0, 0, [])
+    flow10= Flowshop(0, 0, [])
+    flow11 = Flowshop(0, 0, [])
+
+    flow.definir_par("tai01.txt")
+    flow1.definir_par("tai02.txt")
+    flow2.definir_par("tai11.txt")
+    flow3.definir_par("tai12.txt")
+    flow4.definir_par("tai21.txt")
+    flow5.definir_par("tai22.txt")
+    flow6.definir_par("tai31.txt")
+    flow7.definir_par("tai32.txt")
+    flow8.definir_par("tai41.txt")
+    flow9.definir_par("tai42.txt")
+    flow10.definir_par("tai51.txt")
+    flow11.definir_par("tai52.txt")
 
 
-    print(flow.grasp(10))
 
-
+    print(flow.grasp(50))
+    print("02")
+    print(flow1.grasp(50))
+    print("11")
+    print(flow2.grasp(50))
+    print("12")
+    print(flow3.grasp(50))
+    print("21")
+    print(flow4.grasp(50))
+    print("22")
+    print(flow5.grasp(50))
+    print("31")
+    print(flow6.grasp(50))
+    print("32")
+    print(flow7.grasp(50))
+    print("41")
+    print(flow8.grasp(50))
+    print("42")
+    print(flow9.grasp(50))
+    print("51")
+    print(flow10.grasp(50))
+    print("52")
+    print(flow11.grasp(50))
