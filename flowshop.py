@@ -352,6 +352,33 @@ class Flowshop():
         ordonnancement_final.ordonnancer_liste_job(sequence_final)
         return ordonnancement_final
 
+    def recherchel_echange_job_evolutive(self,ordonnancement_debut):
+        # initialisation
+
+        duree_test=ordonnancement_debut.duree()
+        sequence_test=ordonnancement_debut.sequence().copy()
+
+
+        #on effectue tout les échanges possible deux à deux avec la séquence initial
+        for i in range (self.nb_jobs):
+            for j in range (self.nombre_jobs()):
+                if j!=i:
+                    ordo = ordonnancement.Ordonnancement(self.nb_machines)
+                    new_sequence=sequence_test.copy()
+                    new_sequence[i]=sequence_test[j]
+                    new_sequence[j]=sequence_test[i]
+                    ordo.ordonnancer_liste_job(new_sequence)
+
+                    # si la nouvelle séquence donne un meilleur résultat, on change la sequence final
+                    if ordo.duree()<duree_test:
+                        duree_test=ordo.duree()
+                        sequence_test=ordo.sequence().copy()
+
+        # on cree notre ordonnacement final avec la sequence final
+        ordonnancement_final=ordonnancement.Ordonnancement(self.nb_machines)
+        ordonnancement_final.ordonnancer_liste_job(sequence_test)
+        return ordonnancement_final
+
     def grasp(self,nb_candidat):
         #initialisation
         alpha=0.5
@@ -362,7 +389,7 @@ class Flowshop():
         for i in range(nb_candidat):
             ordo_first=self.greedyrandomised_rank()[1]
             #recherche local choisi
-            ordo=self.recherchel_echange_job_total(ordo_first)
+            ordo=self.recherchel_echange_job_evolutive(ordo_first)
             #
             liste_ordonnacement.append(ordo)
 
@@ -475,28 +502,26 @@ if __name__ == "__main__":
     flow10.definir_par("tai51.txt")
     flow11.definir_par("tai52.txt")
 
-
-
     print(flow.grasp(50))
     print("02")
-    print(flow1.grasp(50))
+    print(flow1.grasp(30))
     print("11")
-    print(flow2.grasp(50))
+    print(flow2.grasp(30))
     print("12")
-    print(flow3.grasp(50))
+    print(flow3.grasp(30))
     print("21")
-    print(flow4.grasp(50))
+    print(flow4.grasp(30))
     print("22")
-    print(flow5.grasp(50))
+    print(flow5.grasp(30))
     print("31")
-    print(flow6.grasp(50))
+    print(flow6.grasp(30))
     print("32")
-    print(flow7.grasp(50))
+    print(flow7.grasp(30))
     print("41")
-    print(flow8.grasp(50))
+    print(flow8.grasp(30))
     print("42")
-    print(flow9.grasp(50))
+    print(flow9.grasp(30))
     print("51")
-    print(flow10.grasp(50))
+    print(flow10.grasp(30))
     print("52")
-    print(flow11.grasp(50))
+    print(flow11.grasp(30))
